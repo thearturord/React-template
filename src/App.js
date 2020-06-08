@@ -1,98 +1,100 @@
-import React, {Component} from 'react';
-import Buscador from './componentes/Buscador';
-import Resultado from './componentes/Resultado';
+import React, { Component } from "react";
+import Searcher from "./components/Searcher";
+import Results from "./components/Results";
 
 /* const apiKey1 = "15604406-ef22fe9d807bace224d43b79f";
 const apiKey2 = "15603947-038295202b5d36e5d1213a2d1"; */
 
-class App extends Component{
-
+class App extends Component {
   state = {
-    termino:'',
-    imagenes: [],
-    pagina: ''
-  }
+    term: "",
+    images: [],
+    page: "",
+  };
 
   scroll = () => {
-    const elemento = document.querySelector('.jumbotron');
-    elemento.scrollIntoView('smooth', 'end')
-  }
+    const element = document.querySelector(".jumbotron");
+    element.scrollIntoView("smooth", "end");
+  };
 
-  paginaAnterior = () => {
-      // read state
-      let pagina = this.state.pagina;
+  previousPage = () => {
+    // read state
+    let page = this.state.page;
 
-      // if page is 1, do not go back
+    // if page is 1, do not go back
 
-      if(pagina === 1) return null;
+    if (page === 1) return null;
 
-      // add 1 to the actual page
-      pagina -= 1;
+    // add 1 to the actual page
+    page -= 1;
 
-      // add state change
-      this.setState({
-        pagina
-      }, () => {
-        this.consultarApi();
+    // add state change
+    this.setState(
+      {
+        page,
+      },
+      () => {
+        this.consultAPI();
         this.scroll();
-      });
-  }
+      }
+    );
+  };
 
-  paginaSiguiente = () => {
-      // read state
-      let pagina = this.state.pagina;
+  nextPage = () => {
+    // read state
+    let page = this.state.page;
 
-      // add 1 to the actual page
-      pagina += 1;
+    // add 1 to the actual page
+    page += 1;
 
-      // add state change
-      this.setState({
-        pagina
-      }, () => {
-        this.consultarApi();
+    // add state change
+    this.setState(
+      {
+        page,
+      },
+      () => {
+        this.consultAPI();
         this.scroll();
-      });
-  }
+      }
+    );
+  };
 
-  
-
-  consultarApi = () => {
-
-    const termino = this.state.termino;
-    const pagina = this.state.pagina;
-    const url = `https://pixabay.com/api/?key=15603947-038295202b5d36e5d1213a2d1&q=${termino}&per_page=30&page=${pagina}`;
+  consultAPI = () => {
+    const term = this.state.term;
+    const page = this.state.page;
+    const url = `https://pixabay.com/api/?key=15603947-038295202b5d36e5d1213a2d1&q=${term}&per_page=30&page=${page}`;
 
     fetch(url)
-      .then(respuesta => respuesta.json())
-      .then(resultado => this.setState({ imagenes : resultado.hits}) )
-    
-  }
+      .then((response) => response.json())
+      .then((result) => this.setState({ images: result.hits }));
+  };
 
-  datosBusqueda = (termino) => {
-    this.setState({
-      termino : termino,
-      pagina : 1
-    }, () => {
-      this.consultarApi();
-    })   
-  }
+  searchData = (term) => {
+    this.setState(
+      {
+        term: term,
+        page: 1,
+      },
+      () => {
+        this.consultAPI();
+      }
+    );
+  };
 
-  render(){
+  render() {
     return (
       <div className="app container">
         <div className="jumbotron">
-          <p className="lead text-center">Buscador de Imagenes</p>
-          <Buscador
-            datosBusqueda={this.datosBusqueda}
+          <p className="lead text-center">Search Images</p>
+          <Searcher searchData={this.searchData} />
+        </div>
+        <div className="row justify-content-center">
+          <Results
+            images={this.state.images}
+            previousPage={this.previousPage}
+            nextPage={this.nextPage}
           />
         </div>
-      <div className="row justify-content-center">
-        <Resultado
-            imagenes={this.state.imagenes}
-            paginaAnterior={this.paginaAnterior}
-            paginaSiguiente={this.paginaSiguiente}
-        />
-      </div>
       </div>
     );
   }
